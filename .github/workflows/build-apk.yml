@@ -13,18 +13,14 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '17'
-    - name: Descomprimir tu proyecto ZIP
-      run: |
-        unzip -q ConHor-1-2-proyecto.zip
-        cp -r ConHor/* . 2>/dev/null || true
-        cp -r ConHor/.* . 2>/dev/null || true
 
     - name: Instalar Gradle en la Nube
       uses: gradle/actions/setup-gradle@v4
 
     - name: Descomprimir tu proyecto ZIP
       run: |
-        unzip -q conhor-1-2-proyecto.zip
+        # Este comando busca de forma inteligente cualquier archivo .zip sin importar el nombre
+        unzip -q ./*.zip || unzip -q ./*/*.zip || echo "No se pudo descomprimir"
         cp -r ConHor/* . 2>/dev/null || true
         cp -r ConHor/.* . 2>/dev/null || true
 
