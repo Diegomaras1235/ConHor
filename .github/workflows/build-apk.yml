@@ -20,12 +20,13 @@ jobs:
         cp -r ConHor/* . 2>/dev/null || true
         cp -r ConHor/.* . 2>/dev/null || true
 
-    - name: Forzar Limpieza y Fabricar Gradle 8.4
+    - name: Resetear Motor Gradle
       run: |
-        # Eliminamos rastros viejos e instalamos la version correcta
-        rm -f gradlew gradlew.bat
-        rm -rf gradle/
-        gradle wrapper --gradle-version 8.4
+        # Borramos cualquier rastro congelado de las versiones fallidas
+        rm -rf gradle .gradle gradlew gradlew.bat
+        
+        # Le pedimos a la nube que use su version estable por defecto
+        gradle wrapper --gradle-version 8.7
         chmod +x gradlew
 
     - name: Compilar APK de Horarios
