@@ -19,14 +19,14 @@ jobs:
 
     - name: Descomprimir tu proyecto ZIP
       run: |
-        # Este comando busca de forma inteligente cualquier archivo .zip sin importar el nombre
         unzip -q ./*.zip || unzip -q ./*/*.zip || echo "No se pudo descomprimir"
         cp -r ConHor/* . 2>/dev/null || true
         cp -r ConHor/.* . 2>/dev/null || true
 
     - name: Fabricar el motor de construccion
       run: |
-        gradle wrapper --gradle-version 8.0
+        # Actualizado a la version 9.5 requerida por tu app
+        gradle wrapper --gradle-version 9.5
         chmod +x gradlew
 
     - name: Compilar APK de Horarios
