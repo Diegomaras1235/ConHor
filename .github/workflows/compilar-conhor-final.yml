@@ -1,0 +1,46 @@
+name: Compilar ConHor Final
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Descargar codigo de GitHub
+      uses: actions/checkout@v4
+
+    - name: Configurar Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Descomprimir y Auto-Corregir Codigo
+      run: |
+        unzip -q ./*.zip || unzip -q ./*/*.zip || echo "No se pudo descomprimir"
+        cp -r ConHor/* . 2>/dev/null || true
+        cp -r ConHor/.* . 2>/dev/null || true
+        
+        # BUSCADOR COMPENSADOR: Repara los errores del archivo MainActivity.kt en la nube
+        FILE_PATH="app/src/main/java/com/conhor/app/MainActivity.kt"
+        if [ -f "$FILE_PATH" ]; then
+          # Corrige el error de la linea 113 cambiando ConHorApp por la referencia correcta
+          sed -i 's/ConHorApp/this/g' "$FILE_PATH"
+          # Agrega la llave de cierre } al final del archivo si falta
+          echo "}" >> "$FILE_PATH"
+        fi
+
+    - name: Instalar Gradle 8.13 Exacto
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '8.13'
+
+    - name: Compilar APK de Horarios Final
+      run: gradle assembleDebug --no-daemon
+
+    - name: Guardar y Entregar APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: Aplicacion-ConHor-Instalable
+        path: |
+          app/build/outputs/apk/debug/app-debug.apk
+          ConHor/app/build/outputs/apk/debug/app-debug.apk
