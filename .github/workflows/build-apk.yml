@@ -20,17 +20,21 @@ jobs:
         cp -r ConHor/* . 2>/dev/null || true
         cp -r ConHor/.* . 2>/dev/null || true
 
-    - name: Resetear Motor Gradle
+    - name: Forzar compatibilidad de motor
       run: |
-        # Borramos cualquier rastro congelado de las versiones fallidas
+        # Borramos rastros viejos
         rm -rf gradle .gradle gradlew gradlew.bat
         
-        # Le pedimos a la nube que use su version estable por defecto
-        gradle wrapper --gradle-version 8.7
+        # Creamos la configuracion exacta que engaña al sistema y fuerza Gradle 8.4
+        mkdir -p gradle/wrapper
+        echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip" > gradle/wrapper/gradle-wrapper.properties
+        
+        # Bajamos el ejecutable limpio directamente de internet
+        wget -q https://githubusercontent.com
         chmod +x gradlew
 
     - name: Compilar APK de Horarios
-      run: ./gradlew assembleDebug --no-daemon --stacktrace
+      run: ./gradlew assembleDebug --no-daemon
 
     - name: Guardar y Entregar APK
       uses: actions/upload-artifact@v4
