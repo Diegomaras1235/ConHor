@@ -20,21 +20,13 @@ jobs:
         cp -r ConHor/* . 2>/dev/null || true
         cp -r ConHor/.* . 2>/dev/null || true
 
-    - name: Forzar compatibilidad de motor
-      run: |
-        # Borramos rastros viejos
-        rm -rf gradle .gradle gradlew gradlew.bat
-        
-        # Creamos la configuracion exacta que engaña al sistema y fuerza Gradle 8.4
-        mkdir -p gradle/wrapper
-        echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip" > gradle/wrapper/gradle-wrapper.properties
-        
-        # Bajamos el ejecutable limpio directamente de internet
-        wget -q https://githubusercontent.com
-        chmod +x gradlew
+    - name: Instalar Gradle 8.4 Oficial
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '8.4'
 
     - name: Compilar APK de Horarios
-      run: ./gradlew assembleDebug --no-daemon
+      run: gradle assembleDebug --no-daemon --stacktrace
 
     - name: Guardar y Entregar APK
       uses: actions/upload-artifact@v4
