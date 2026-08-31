@@ -14,28 +14,40 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: Descomprimir Proyecto en Ruta Correcta
+    - name: Descomprimir y Corregir en Ruta Real
       run: |
-        # Descomprimimos de forma limpia
+        # Descomprimimos el ZIP original tal cual está
         unzip -q ./*.zip || unzip -q ./*/*.zip || echo "No se pudo descomprimir"
         
-        # Si el ZIP creo una carpeta ConHor, movemos su contenido directamente a la raiz
-        if [ -d "ConHor" ]; then
-          cp -r ConHor/* . 2>/dev/null || true
-          cp -r ConHor/.* . 2>/dev/null || true
-          rm -rf ConHor
+        # Guardamos la ruta exacta donde GitHub guardó tu archivo original
+        TARGET_FILE="ConHor/app/src/main/java/com/conhor/app/MainActivity.kt"
+        
+        # Si el archivo existe en esa ruta profunda, lo reparamos directamente ahí
+        if [ -f "$TARGET_FILE" ]; then
+          echo "Modificando archivo original en la ruta correcta..."
+          # Arregla el texto suelto cambiándolo por una referencia limpia de Kotlin
+          sed -i 's/ConHorApp/this/g' "$TARGET_FILE"
+          # Agrega la llave de cierre que le falta al bloque final
+          echo "}" >> "$TARGET_FILE"
+        else
+          echo "No se encontró el archivo en la ruta esperada."
         fi
 
     - name: Instalar Gradle 8.13 Exacto
       uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: '8.13'
+        # Forzamos a Gradle a ejecutar el proyecto dentro de la carpeta interna real
+        build-root-directory: ConHor
 
     - name: Compilar APK de Horarios Final
-      run: gradle assembleDebug --no-daemon
+      run: |
+        cd ConHor
+        gradle assembleDebug --no-daemon
 
     - name: Guardar y Entregar APK
       uses: actions/upload-artifact@v4
       with:
         name: Aplicacion-ConHor-Instalable
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: |
+          ConHor/app/build/outputs/apk/debug/app-debug.apk
