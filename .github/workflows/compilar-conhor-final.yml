@@ -14,47 +14,17 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: Descomprimir y Reemplazar Codigo Defectuoso
+    - name: Descomprimir Proyecto en Ruta Correcta
       run: |
+        # Descomprimimos de forma limpia
         unzip -q ./*.zip || unzip -q ./*/*.zip || echo "No se pudo descomprimir"
-        cp -r ConHor/* . 2>/dev/null || true
-        cp -r ConHor/.* . 2>/dev/null || true
         
-        # BORRADOR Y REEMPLAZO TOTAL: Sustituye el archivo roto por uno nuevo funcional
-        FILE_PATH="app/src/main/java/com/conhor/app/MainActivity.kt"
-        mkdir -p app/src/main/java/com/conhor/app
-        
-        cat << 'EOF' > "$FILE_PATH"
-        package com.conhor.app
-
-        import android.os.Bundle
-        import android.widget.Button
-        import android.widget.Toast
-        import androidx.appcompat.app.AppCompatActivity
-        import java.text.SimpleDateFormat
-        import java.util.Date
-        import java.util.Locale
-
-        class MainActivity : AppCompatActivity() {
-            override fun onCreate(savedInstanceState: Bundle?) {
-                super.onCreate(savedInstanceState)
-                // Intentar cargar el diseño original si existe
-                try {
-                    setContentView(R.layout.activity_main)
-                } catch (e: Exception) {
-                    // Si falla el diseño original, crea un boton de emergencia
-                    val boton = Button(this).apply { 
-                        text = "Registrar Horario de Trabajo" 
-                    }
-                    setContentView(boton)
-                }
-
-                // Registro basico de control de tiempo
-                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                Toast.makeText(this, "Control ConHor Iniciado: ${sdf.format(Date())}", Toast.LENGTH_LONG).show()
-            }
-        }
-        EOF
+        # Si el ZIP creo una carpeta ConHor, movemos su contenido directamente a la raiz
+        if [ -d "ConHor" ]; then
+          cp -r ConHor/* . 2>/dev/null || true
+          cp -r ConHor/.* . 2>/dev/null || true
+          rm -rf ConHor
+        fi
 
     - name: Instalar Gradle 8.13 Exacto
       uses: gradle/actions/setup-gradle@v4
@@ -68,6 +38,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Aplicacion-ConHor-Instalable
-        path: |
-          app/build/outputs/apk/debug/app-debug.apk
-          ConHor/app/build/outputs/apk/debug/app-debug.apk
+        path: app/build/outputs/apk/debug/app-debug.apk
