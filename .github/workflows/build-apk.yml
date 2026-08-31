@@ -14,23 +14,22 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: Instalar Gradle en la Nube
-      uses: gradle/actions/setup-gradle@v4
-
     - name: Descomprimir tu proyecto ZIP
       run: |
         unzip -q ./*.zip || unzip -q ./*/*.zip || echo "No se pudo descomprimir"
         cp -r ConHor/* . 2>/dev/null || true
         cp -r ConHor/.* . 2>/dev/null || true
 
-    - name: Fabricar el motor de construccion
+    - name: Forzar Limpieza y Fabricar Gradle 8.4
       run: |
-        # Usamos Gradle 8.4 para corregir el error de las APIs eliminadas
+        # Eliminamos rastros viejos e instalamos la version correcta
+        rm -f gradlew gradlew.bat
+        rm -rf gradle/
         gradle wrapper --gradle-version 8.4
         chmod +x gradlew
 
     - name: Compilar APK de Horarios
-      run: ./gradlew assembleDebug --stacktrace
+      run: ./gradlew assembleDebug --no-daemon --stacktrace
 
     - name: Guardar y Entregar APK
       uses: actions/upload-artifact@v4
