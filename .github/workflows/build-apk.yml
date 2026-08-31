@@ -20,10 +20,10 @@ jobs:
         cp -r ConHor/* . 2>/dev/null || true
         cp -r ConHor/.* . 2>/dev/null || true
 
-    - name: Instalar Gradle 8.4 Oficial
+    - name: Instalar Gradle 8.13 Exacto
       uses: gradle/actions/setup-gradle@v4
       with:
-        gradle-version: '8.4'
+        gradle-version: '8.13'
 
     - name: Compilar APK de Horarios
       run: gradle assembleDebug --no-daemon --stacktrace
