@@ -25,8 +25,8 @@ jobs:
 
     - name: Fabricar el motor de construccion
       run: |
-        # Actualizado a la version 9.5 requerida por tu app
-        gradle wrapper --gradle-version 9.5
+        # Usamos Gradle 8.4 para corregir el error de las APIs eliminadas
+        gradle wrapper --gradle-version 8.4
         chmod +x gradlew
 
     - name: Compilar APK de Horarios
